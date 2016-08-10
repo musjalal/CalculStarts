@@ -22,18 +22,15 @@ function getUserRepositories(user) {
   return axios.get(githubEndpoint);
 }
 
-// add up all the stars and return the total number of stars across all repositories
+// Return the total number of stars across all repositories
 function computeTotalStars(repositories) {
   return repositories.data.reduce(function(prev, curr) {
     return prev + curr.stargazers_count
   }, 0);
 }
 
-// if a user visits /api/facebook, return the total number of stars 'facebook'
-// has across all it's public repositories on GitHub
 app.get('/api/:username', function(req, res) {
   // get the username parameter in the URL
-  // i.e.: username = "coligo-io" in http://localhost:5000/api/coligo-io
   var username = req.params.username;
 
   // use the redis client to get the total number of stars associated to that
@@ -44,7 +41,7 @@ app.get('/api/:username', function(req, res) {
         // the result exists in our cache - return it to our user immediately
         res.send({ "totalStars": result, "source": "redis cache" });
       } else {
-        // we couldn't find the key "coligo-io" in our cache, so get it
+        // we couldn't find the key in our cache, so get it
         // from the GitHub API
         getUserRepositories(username)
           .then(computeTotalStars)
